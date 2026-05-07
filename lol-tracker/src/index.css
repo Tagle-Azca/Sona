@@ -1,0 +1,48 @@
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700&family=Rajdhani:wght@400;500;600;700&display=swap');
+
+:root {
+  --bg-primary: #080c14;
+  --bg-secondary: #0d1526;
+  --bg-card: #111d2e;
+  --bg-card-hover: #162035;
+  --border: #1e3a5f;
+  --border-light: #254870;
+  --gold: #c89b3c;
+  --gold-light: #f0e6c8;
+  --gold-dark: #9a7a2e;
+  --text-primary: #cddaf0;
+  --text-secondary: #7fa2c8;
+  --text-muted: #4a6a8a;
+  --win: #00d4a0;
+  --loss: #e84057;
+  --accent: #0bc4e3;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Sora', sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  line-height: 1.5;
+  font-size: 14px;
+}
+
+h1, h2, h3, h4, h5 {
+  font-family: 'Rajdhani', sans-serif;
+  letter-spacing: 0.03em;
+}
+
+a { color: inherit; text-decoration: none; }
+
+button { cursor: pointer; font-family: 'Sora', sans-serif; border: none; outline: none; }
+input, select { font-family: 'Sora', sans-serif; outline: none; }
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-secondary); }
+::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 3px; }
+
+#root { min-height: 100vh; display: flex; flex-direction: column; }

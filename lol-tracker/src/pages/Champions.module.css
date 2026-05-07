@@ -1,0 +1,101 @@
+.page { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+.pageTitle { font-size: 2rem; font-weight: 700; color: #c89b3c; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.25rem; }
+.pageSub { color: #4a6a8a; font-size: 0.85rem; margin-bottom: 1.75rem; }
+
+.controls { display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; margin-bottom: 1rem; }
+
+.searchInput {
+  background: #111d2e;
+  border: 1px solid #1e3a5f;
+  border-radius: 6px;
+  padding: 0.6rem 1rem;
+  color: #cddaf0;
+  font-size: 0.88rem;
+  width: 240px;
+  transition: border-color 0.2s;
+}
+.searchInput:focus { border-color: #c89b3c; }
+.searchInput::placeholder { color: #4a6a8a; }
+
+.roleFilter { display: flex; gap: 0.35rem; flex-wrap: wrap; }
+
+.roleBtn {
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: rgba(30, 58, 95, 0.3);
+  color: #7fa2c8;
+  border: 1px solid #1e3a5f;
+  transition: all 0.15s;
+}
+.roleBtn:hover { border-color: #254870; color: #cddaf0; }
+.roleBtnActive { background: rgba(200, 155, 60, 0.15) !important; color: #c89b3c !important; border-color: rgba(200, 155, 60, 0.4) !important; }
+
+.roleColor_TOP { --c: #fb923c; }
+.roleColor_JUNGLE { --c: #4ade80; }
+.roleColor_MID { --c: #a78bfa; }
+.roleColor_BOT { --c: #60a5fa; }
+.roleColor_SUPPORT { --c: #f472b6; }
+
+.count { color: #4a6a8a; font-size: 0.8rem; margin-bottom: 1.25rem; }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.card {
+  background: #111d2e;
+  border: 1px solid #1e3a5f;
+  border-radius: 8px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  transition: border-color 0.2s, transform 0.15s, background 0.2s;
+  text-align: center;
+}
+
+.card:hover { border-color: #c89b3c; background: #162035; transform: translateY(-2px); }
+
+.cardAvatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1e3a5f, #2a4a7a);
+  border: 2px solid #254870;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.cardAvatarText { font-family: 'Rajdhani', sans-serif; font-size: 1.3rem; font-weight: 700; color: #c89b3c; }
+
+.cardBody { display: flex; flex-direction: column; gap: 0.4rem; align-items: center; width: 100%; }
+
+.cardName { font-family: 'Rajdhani', sans-serif; font-size: 1.05rem; font-weight: 700; color: #cddaf0; text-transform: uppercase; }
+
+.roleTags { display: flex; gap: 0.3rem; flex-wrap: wrap; justify-content: center; }
+
+.roleTag {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.15rem 0.4rem;
+  border-radius: 3px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.roleColor_TOP .roleTag, .roleTag.roleColor_TOP { background: rgba(251,146,60,0.15); color: #fb923c; border: 1px solid rgba(251,146,60,0.3); }
+.roleColor_JUNGLE .roleTag, .roleTag.roleColor_JUNGLE { background: rgba(74,222,128,0.15); color: #4ade80; border: 1px solid rgba(74,222,128,0.3); }
+.roleColor_MID .roleTag, .roleTag.roleColor_MID { background: rgba(167,139,250,0.15); color: #a78bfa; border: 1px solid rgba(167,139,250,0.3); }
+.roleColor_BOT .roleTag, .roleTag.roleColor_BOT { background: rgba(96,165,250,0.15); color: #60a5fa; border: 1px solid rgba(96,165,250,0.3); }
+.roleColor_SUPPORT .roleTag, .roleTag.roleColor_SUPPORT { background: rgba(244,114,182,0.15); color: #f472b6; border: 1px solid rgba(244,114,182,0.3); }
+
+.statsRow { display: flex; gap: 0.75rem; font-size: 0.75rem; color: #7fa2c8; }
+.maxOrder { font-size: 0.72rem; color: #4a6a8a; font-weight: 600; letter-spacing: 0.03em; }

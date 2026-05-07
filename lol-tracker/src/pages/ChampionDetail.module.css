@@ -1,0 +1,122 @@
+.page { max-width: 1000px; margin: 0 auto; padding: 2rem 1.5rem; display: flex; flex-direction: column; gap: 1.5rem; }
+
+.notFound { text-align: center; padding: 4rem 2rem; }
+.notFound h2 { color: #c89b3c; margin-bottom: 1rem; }
+
+.back { color: #7fa2c8; font-size: 0.85rem; transition: color 0.15s; display: inline-block; }
+.back:hover { color: #c89b3c; }
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  background: #111d2e;
+  border: 1px solid #1e3a5f;
+  border-radius: 10px;
+  padding: 1.75rem;
+}
+
+.avatar {
+  width: 90px;
+  height: 90px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #1e3a5f, #c89b3c);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #c89b3c;
+  flex-shrink: 0;
+}
+.avatarText { font-family: 'Rajdhani', sans-serif; font-size: 2rem; font-weight: 700; color: #f0e6c8; }
+
+.name { font-size: 2.5rem; font-weight: 700; color: #cddaf0; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.5rem; }
+
+.roles { display: flex; gap: 0.4rem; margin-bottom: 0.75rem; }
+
+.roleBadge {
+  font-size: 0.72rem; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.05em;
+}
+.role_MID { background: rgba(139,92,246,0.15); color: #a78bfa; border: 1px solid rgba(139,92,246,0.3); }
+.role_TOP { background: rgba(249,115,22,0.15); color: #fb923c; border: 1px solid rgba(249,115,22,0.3); }
+.role_JUNGLE { background: rgba(34,197,94,0.15); color: #4ade80; border: 1px solid rgba(34,197,94,0.3); }
+.role_BOT { background: rgba(59,130,246,0.15); color: #60a5fa; border: 1px solid rgba(59,130,246,0.3); }
+.role_SUPPORT { background: rgba(236,72,153,0.15); color: #f472b6; border: 1px solid rgba(236,72,153,0.3); }
+
+.maxOrder { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+.maxLabel { font-size: 0.78rem; color: #7fa2c8; }
+.maxKey {
+  background: rgba(200,155,60,0.15);
+  color: #c89b3c;
+  border: 1px solid rgba(200,155,60,0.3);
+  border-radius: 4px;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+
+.card {
+  background: #111d2e;
+  border: 1px solid #1e3a5f;
+  border-radius: 8px;
+  padding: 1.5rem;
+}
+
+.cardTitle { font-size: 1.05rem; font-weight: 700; color: #cddaf0; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.2rem; }
+.cardSub { font-size: 0.75rem; color: #4a6a8a; margin-bottom: 1rem; }
+
+.statsGrid { display: flex; flex-direction: column; gap: 0.6rem; }
+
+.statRow { display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 0; border-bottom: 1px solid #1e3a5f; }
+.statRow:last-child { border-bottom: none; }
+.statIcon { font-size: 1rem; width: 1.5rem; text-align: center; }
+.statLabel { flex: 1; color: #7fa2c8; font-size: 0.85rem; }
+.statVal { font-weight: 700; color: #cddaf0; font-size: 0.9rem; }
+
+.abilityList { display: flex; flex-direction: column; gap: 0.6rem; }
+
+.abilityRow { display: flex; align-items: center; gap: 0.75rem; }
+
+.abilityKey {
+  background: rgba(30,58,95,0.6);
+  border: 1px solid #254870;
+  border-radius: 4px;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #7fa2c8;
+  min-width: 52px;
+  text-align: center;
+  text-transform: uppercase;
+}
+.abilityR { background: rgba(200,155,60,0.15); color: #c89b3c; border-color: rgba(200,155,60,0.3); }
+
+.abilityName { color: #cddaf0; font-size: 0.85rem; }
+
+.relGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; }
+
+.relCard {
+  background: rgba(0, 212, 160, 0.05);
+  border: 1px solid rgba(0, 212, 160, 0.2);
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.counterCard {
+  background: rgba(232, 64, 87, 0.05);
+  border-color: rgba(232, 64, 87, 0.2);
+}
+
+.relName { font-family: 'Rajdhani', sans-serif; font-size: 1rem; font-weight: 700; color: #cddaf0; text-transform: uppercase; margin-bottom: 0.6rem; }
+
+.relStats { display: flex; flex-direction: column; gap: 0.3rem; }
+.relStats > div { display: flex; justify-content: space-between; align-items: center; }
+.relLabel { font-size: 0.75rem; color: #7fa2c8; }
+.relVal { font-size: 0.82rem; font-weight: 700; color: #cddaf0; }
+
+.noData { color: #4a6a8a; font-size: 0.85rem; text-align: center; padding: 1rem; }
+
+@media (max-width: 600px) {
+  .grid { grid-template-columns: 1fr; }
+}

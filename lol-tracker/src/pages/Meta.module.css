@@ -1,0 +1,94 @@
+.page { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem; display: flex; flex-direction: column; gap: 1.5rem; }
+
+.pageTitle { font-size: 2rem; font-weight: 700; color: #c89b3c; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.25rem; }
+.pageSub { color: #4a6a8a; font-size: 0.85rem; }
+
+.toolbar { display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: center; }
+.label { font-size: 0.75rem; color: #7fa2c8; text-transform: uppercase; letter-spacing: 0.05em; margin-right: 0.25rem; }
+
+.patchSelect, .sortSelect, .viewToggle { display: flex; align-items: center; gap: 0.35rem; }
+
+.chip {
+  padding: 0.35rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: rgba(30,58,95,0.3);
+  color: #7fa2c8;
+  border: 1px solid #1e3a5f;
+  transition: all 0.15s;
+}
+.chip:hover { border-color: #254870; color: #cddaf0; }
+.chipActive { background: rgba(200,155,60,0.15) !important; color: #c89b3c !important; border-color: rgba(200,155,60,0.4) !important; }
+
+.tableWrap {
+  background: #111d2e;
+  border: 1px solid #1e3a5f;
+  border-radius: 8px;
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.table th {
+  padding: 0.85rem 1rem;
+  text-align: left;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #7fa2c8;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid #1e3a5f;
+  background: rgba(8,12,20,0.4);
+}
+
+.table td {
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid rgba(30,58,95,0.4);
+  color: #cddaf0;
+}
+
+.table tr:last-child td { border-bottom: none; }
+.table tr:hover td { background: rgba(30,58,95,0.2); }
+
+.rank { color: #4a6a8a; font-size: 0.78rem; width: 2rem; }
+.champName { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 0.95rem; }
+.muted { color: #7fa2c8; font-size: 0.8rem; }
+
+.rateCell { display: flex; align-items: center; gap: 0.5rem; }
+.rateBar { height: 6px; border-radius: 3px; min-width: 4px; }
+
+.chartCard {
+  background: #111d2e;
+  border: 1px solid #1e3a5f;
+  border-radius: 8px;
+  padding: 1.5rem 1.5rem 0.5rem;
+}
+
+.proSection { display: flex; flex-direction: column; gap: 0.75rem; }
+.sectionTitle { font-size: 1.1rem; font-weight: 700; color: #cddaf0; text-transform: uppercase; letter-spacing: 0.05em; }
+.sectionSub { font-size: 0.75rem; color: #4a6a8a; margin-top: -0.5rem; }
+
+.proGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.75rem; }
+
+.proCard {
+  background: #111d2e;
+  border: 1px solid #1e3a5f;
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
+  transition: border-color 0.2s;
+}
+.proCard:hover { border-color: #c89b3c; }
+
+.proName { font-family: 'Rajdhani', sans-serif; font-size: 0.95rem; font-weight: 700; color: #cddaf0; text-transform: uppercase; margin-bottom: 0.6rem; }
+.proStats { display: flex; justify-content: space-around; }
+.proStat { display: flex; flex-direction: column; gap: 0.1rem; align-items: center; }
+.proStatVal { font-family: 'Rajdhani', sans-serif; font-size: 1.1rem; font-weight: 700; color: #c89b3c; }
+.proStatLabel { font-size: 0.65rem; color: #4a6a8a; text-transform: uppercase; }
