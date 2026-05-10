@@ -1,5 +1,7 @@
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { mockChampions, mockSynergies, mockCounters } from '../data/mockData';
+import { getChampionSynergies, getChampionCounters } from '../services/dgraphService';
 import styles from './ChampionDetail.module.css';
 
 const ABILITY_KEYS = ['passive', 'q', 'w', 'e', 'r'];
@@ -9,6 +11,15 @@ export default function ChampionDetail() {
   const { id } = useParams();
   const champion = mockChampions.find((c) => c.championId === id);
 
+  const [synergies, setSynergies] = useState(mockSynergies[champion?.name] || []);
+  const [counters, setCounters] = useState(mockCounters[champion?.name] || []);
+
+  useEffect(() => {
+    if (!champion) return;
+    getChampionSynergies(champion.championId).then(setSynergies);
+    getChampionCounters(champion.championId).then(setCounters);
+  }, [champion?.championId]);
+
   if (!champion) {
     return (
       <div className={styles.notFound}>
@@ -17,9 +28,6 @@ export default function ChampionDetail() {
       </div>
     );
   }
-
-  const synergies = mockSynergies[champion.name] || [];
-  const counters = mockCounters[champion.name] || [];
 
   return (
     <div className={styles.page}>
@@ -50,10 +58,10 @@ export default function ChampionDetail() {
           <h2 className={styles.cardTitle}>Estadísticas Base</h2>
           <p className={styles.cardSub}>MongoDB — baseStats</p>
           <div className={styles.statsGrid}>
-            <StatRow icon="❤" label="HP" value={champion.baseStats.hp} />
-            <StatRow icon="⚔" label="Daño base" value={champion.baseStats.ad} />
-            <StatRow icon="🛡" label="Armadura" value={champion.baseStats.armor} />
-            <StatRow icon="✨" label="Resistencia mágica" value={champion.baseStats.mr} />
+            <StatRow icon="fi-rr-heart" label="HP" value={champion.baseStats.hp} />
+            <StatRow icon="fi-rr-sword" label="Daño base" value={champion.baseStats.ad} />
+            <StatRow icon="fi-rr-shield" label="Armadura" value={champion.baseStats.armor} />
+            <StatRow icon="fi-rr-bolt" label="Resistencia mágica" value={champion.baseStats.mr} />
           </div>
         </div>
 
@@ -123,7 +131,7 @@ export default function ChampionDetail() {
 function StatRow({ icon, label, value }) {
   return (
     <div className={styles.statRow}>
-      <span className={styles.statIcon}>{icon}</span>
+      <i className={`fi ${icon} ${styles.statIcon}`} />
       <span className={styles.statLabel}>{label}</span>
       <span className={styles.statVal}>{value}</span>
     </div>

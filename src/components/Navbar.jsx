@@ -8,6 +8,7 @@ const links = [
   { to: '/pro', label: 'Pro Scene' },
   { to: '/meta', label: 'Meta' },
   { to: '/tournaments', label: 'Torneos' },
+  { to: '/graph', label: 'Grafo' },
 ];
 
 export default function Navbar() {
@@ -17,7 +18,7 @@ export default function Navbar() {
     <nav className={styles.nav}>
       <div className={styles.inner}>
         <Link to="/" className={styles.logo}>
-          <span className={styles.logoIcon}>⚔</span>
+          <i className={`fi fi-rr-sword ${styles.logoIcon}`} />
           <span>LoL<strong>Tracker</strong></span>
         </Link>
         <ul className={styles.links}>

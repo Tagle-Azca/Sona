@@ -1,8 +1,10 @@
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import {
   LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
 } from 'recharts';
 import { mockPlayers, mockPerformance, mockRankHistory } from '../data/mockData';
+import { getPlayerMains } from '../services/dgraphService';
 import styles from './PlayerProfile.module.css';
 
 const TIER_ORDER = { IRON: 0, BRONZE: 1, SILVER: 2, GOLD: 3, PLATINUM: 4, EMERALD: 5, DIAMOND: 6, MASTER: 7, GRANDMASTER: 8, CHALLENGER: 9 };
@@ -16,6 +18,13 @@ export default function PlayerProfile() {
   const player = mockPlayers[name];
   const perf = player ? mockPerformance[player.puuid] : null;
   const history = player ? (mockRankHistory[player.puuid] || []) : [];
+
+  const [mains, setMains] = useState([]);
+
+  useEffect(() => {
+    if (!player) return;
+    getPlayerMains(player.puuid).then(setMains);
+  }, [player?.puuid]);
 
   if (!player) {
     return (
@@ -114,6 +123,27 @@ export default function PlayerProfile() {
           </div>
         </div>
       </div>
+
+      {mains.length > 0 && (
+        <div className={styles.card}>
+          <h2 className={styles.cardTitle}>Pool de Campeones (Dgraph — MAINS)</h2>
+          <p className={styles.cardSub}>Campeones más jugados por {player.summonerName}</p>
+          <div className={styles.mainsGrid}>
+            {mains.map((m) => (
+              <div key={m.championId} className={styles.mainCard}>
+                <div className={styles.mainRank}>#{m.rank}</div>
+                <div className={styles.mainName}>{m.name}</div>
+                <div className={styles.mainStats}>
+                  <div><span className={styles.relLabel}>Partidas</span><span className={styles.relVal}>{m.gamesPlayed}</span></div>
+                  <div><span className={styles.relLabel}>Win rate</span><span className={styles.relVal} style={{ color: m.winRate >= 0.5 ? '#00d4a0' : '#e84057' }}>{(m.winRate * 100).toFixed(0)}%</span></div>
+                  <div><span className={styles.relLabel}>KDA</span><span className={styles.relVal}>{m.avgKDA}</span></div>
+                  <div><span className={styles.relLabel}>CS/min</span><span className={styles.relVal}>{m.avgCSPerMin}</span></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -3,10 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import styles from './Home.module.css';
 
 const STATS = [
-  { label: 'Partidas Analizadas', value: '2.4M+', icon: '🎮' },
-  { label: 'Campeones', value: '168', icon: '⚔' },
-  { label: 'Pro Players', value: '500+', icon: '🏆' },
-  { label: 'Regiones', value: '12', icon: '🌍' },
+  { label: 'Partidas Analizadas', value: '2.4M+', icon: 'fi-rr-gamepad' },
+  { label: 'Campeones', value: '168', icon: 'fi-rr-sword' },
+  { label: 'Pro Players', value: '500+', icon: 'fi-rr-trophy' },
+  { label: 'Regiones', value: '12', icon: 'fi-rr-globe' },
 ];
 
 export default function Home() {
@@ -61,7 +61,7 @@ export default function Home() {
       <div className={styles.statsBar}>
         {STATS.map(({ label, value, icon }) => (
           <div key={label} className={styles.statItem}>
-            <span className={styles.statIcon}>{icon}</span>
+            <span className={styles.statIcon}><i className={`fi ${icon}`} /></span>
             <div>
               <div className={styles.statValue}>{value}</div>
               <div className={styles.statLabel}>{label}</div>
@@ -72,42 +72,42 @@ export default function Home() {
 
       <div className={styles.sections}>
         <SectionCard
-          icon="📊"
+          icon="fi-rr-chart-histogram"
           title="Perfiles de Jugadores"
           desc="KDA promedio, winrate, roles preferidos, historial reciente y evolución de rank."
           link="/player/Faker"
           linkLabel="Ver perfil de Faker →"
         />
         <SectionCard
-          icon="🗡"
+          icon="fi-rr-sword"
           title="Catálogo de Campeones"
           desc="Stats base, habilidades, orden de maxeo recomendado y synergies competitivas."
           link="/champions"
           linkLabel="Explorar campeones →"
         />
         <SectionCard
-          icon="📈"
+          icon="fi-rr-chart-line-up"
           title="Meta Actual"
           desc="Pick rate, ban rate y win rate por campeón en el parche vigente (Cassandra)."
           link="/meta"
           linkLabel="Ver meta →"
         />
         <SectionCard
-          icon="🏟"
+          icon="fi-rr-users"
           title="Escena Pro"
           desc="Equipos, rosters y jugadores profesionales de todas las ligas regionales."
           link="/pro"
           linkLabel="Ver equipos →"
         />
         <SectionCard
-          icon="🏆"
+          icon="fi-rr-trophy"
           title="Torneos"
           desc="Resultados históricos de MSI, Worlds y torneos regionales por temporada."
           link="/tournaments"
           linkLabel="Ver resultados →"
         />
         <SectionCard
-          icon="🔗"
+          icon="fi-rr-network"
           title="Grafo Social"
           desc="Redes de compañeros, counters entre campeones y trayectorias pro (Dgraph)."
           link="/champions/Ahri"
@@ -122,7 +122,7 @@ function SectionCard({ icon, title, desc, link, linkLabel }) {
   const navigate = useNavigate();
   return (
     <div className={styles.sectionCard} onClick={() => navigate(link)}>
-      <div className={styles.cardIcon}>{icon}</div>
+      <div className={styles.cardIcon}><i className={`fi ${icon}`} /></div>
       <h3 className={styles.cardTitle}>{title}</h3>
       <p className={styles.cardDesc}>{desc}</p>
       <span className={styles.cardLink}>{linkLabel}</span>

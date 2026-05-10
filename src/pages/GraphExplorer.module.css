@@ -1,0 +1,82 @@
+.page {
+  display: flex;
+  height: calc(100vh - 56px);
+  overflow: hidden;
+  background: #080f1a;
+}
+
+/* ── Sidebar ──────────────────────────────────────────────────────────────── */
+
+.sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  background: #0d1929;
+  border-right: 1px solid #1e3a5f;
+  padding: 1.25rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  overflow-y: auto;
+}
+
+.title { display: flex; align-items: center; gap: 0.6rem; }
+.titleIcon { font-size: 1.4rem; color: #c89b3c; }
+.title h2 { font-size: 0.95rem; font-weight: 700; color: #cddaf0; margin: 0; }
+.title p  { font-size: 0.72rem; color: #4a6a8a; margin: 0; }
+
+.stats { display: flex; gap: 0.5rem; }
+.statItem { flex: 1; background: #111d2e; border: 1px solid #1e3a5f; border-radius: 6px; padding: 0.5rem 0.25rem; text-align: center; }
+.statNum   { display: block; font-size: 1.1rem; font-weight: 700; color: #c89b3c; }
+.statLabel { display: block; font-size: 0.62rem; color: #4a6a8a; text-transform: uppercase; letter-spacing: 0.05em; }
+
+.section {}
+.sectionTitle { font-size: 0.68rem; font-weight: 700; color: #4a6a8a; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.5rem; }
+
+.legendItem { display: flex; align-items: center; gap: 0.5rem; font-size: 0.78rem; color: #7fa2c8; padding: 0.15rem 0; }
+.dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.line { width: 14px; height: 2px; border-radius: 2px; flex-shrink: 0; }
+.edgeLabel { font-size: 0.72rem; }
+
+.tooltip {
+  margin-top: auto;
+  background: #111d2e;
+  border: 1px solid #1e3a5f;
+  border-radius: 8px;
+  padding: 0.75rem;
+}
+.tooltipType { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.2rem; }
+.tooltipName { font-size: 0.95rem; font-weight: 700; color: #cddaf0; }
+
+.hint { font-size: 0.68rem; color: #2a4a6a; line-height: 1.4; margin-top: auto; }
+
+/* ── Canvas ───────────────────────────────────────────────────────────────── */
+
+.canvas {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+.loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  color: #4a6a8a;
+  font-size: 0.9rem;
+}
+
+.loadingDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #c89b3c;
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.3; transform: scale(0.8); }
+  50%       { opacity: 1;   transform: scale(1.2); }
+}

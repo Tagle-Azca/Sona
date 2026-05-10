@@ -64,9 +64,9 @@ export default function Champions() {
                 ))}
               </div>
               <div className={styles.statsRow}>
-                <span title="HP">❤ {c.baseStats.hp}</span>
-                <span title="AD">⚔ {c.baseStats.ad}</span>
-                <span title="Armor">🛡 {c.baseStats.armor}</span>
+                <span title="HP"><i className="fi fi-rr-heart" /> {c.baseStats.hp}</span>
+                <span title="AD"><i className="fi fi-rr-sword" /> {c.baseStats.ad}</span>
+                <span title="Armor"><i className="fi fi-rr-shield" /> {c.baseStats.armor}</span>
               </div>
               <div className={styles.maxOrder}>
                 Max: {c.recommendedMaxOrder.join(' → ')}

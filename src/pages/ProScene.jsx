@@ -1,16 +1,21 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { mockProTeams } from '../data/mockData';
+import { getProTeams } from '../services/dgraphService';
 import styles from './ProScene.module.css';
 
 const REGIONS = ['ALL', 'LCK', 'LEC', 'LCS', 'LPL'];
-
-const ROLE_ICON = { TOP: '🗡', JUNGLE: '🌲', MID: '✨', BOT: '🏹', SUPPORT: '🛡' };
+const ROLE_ICON = { TOP: 'fi-rr-sword', JUNGLE: 'fi-rr-leaf', MID: 'fi-rr-bolt', BOT: 'fi-rr-target', SUPPORT: 'fi-rr-shield' };
 
 export default function ProScene() {
   const [region, setRegion] = useState('ALL');
   const [expanded, setExpanded] = useState(null);
+  const [teams, setTeams] = useState(mockProTeams);
 
-  const filtered = mockProTeams.filter((t) => region === 'ALL' || t.region === region);
+  useEffect(() => {
+    getProTeams().then(setTeams);
+  }, []);
+
+  const filtered = teams.filter((t) => region === 'ALL' || t.region === region);
 
   return (
     <div className={styles.page}>
@@ -50,7 +55,7 @@ export default function ProScene() {
               <div className={styles.roster}>
                 {team.roster.map((p) => (
                   <div key={p.proPlayerId} className={styles.playerRow}>
-                    <span className={styles.roleIcon}>{ROLE_ICON[p.role] || '👤'}</span>
+                    <i className={`fi ${ROLE_ICON[p.role] || 'fi-rr-user'} ${styles.roleIcon}`} />
                     <span className={`${styles.playerRole} ${styles['role_' + p.role]}`}>{p.role}</span>
                     <span className={styles.playerName}>{p.username}</span>
                     <span className={styles.playerId}>{p.proPlayerId}</span>
