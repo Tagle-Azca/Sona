@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { mockChampions, mockSynergies, mockCounters } from '../data/mockData';
 import { getChampionSynergies, getChampionCounters } from '../services/dgraphService';
+import { getChampionById } from '../services/mongoService';
 import styles from './ChampionDetail.module.css';
 
 const ABILITY_KEYS = ['passive', 'q', 'w', 'e', 'r'];
@@ -9,16 +10,41 @@ const ABILITY_LABELS = { passive: 'Pasiva', q: 'Q', w: 'W', e: 'E', r: 'R (ULT)'
 
 export default function ChampionDetail() {
   const { id } = useParams();
-  const champion = mockChampions.find((c) => c.championId === id);
-
-  const [synergies, setSynergies] = useState(mockSynergies[champion?.name] || []);
-  const [counters, setCounters] = useState(mockCounters[champion?.name] || []);
+  const [champion, setChampion] = useState(null);
+  const [synergies, setSynergies] = useState([]);
+  const [counters, setCounters] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!champion) return;
-    getChampionSynergies(champion.championId).then(setSynergies);
-    getChampionCounters(champion.championId).then(setCounters);
-  }, [champion?.championId]);
+    if (!id) return;
+    let mounted = true;
+    setLoading(true);
+
+    Promise.all([
+      getChampionById(id),
+      getChampionSynergies(id).catch(() => []),
+      getChampionCounters(id).catch(() => []),
+    ]).then(([champData, syns, ctrs]) => {
+    if (!mounted) return;
+    setChampion(champData || null);
+    setSynergies(syns);
+    setCounters(ctrs);
+    setLoading(false);
+    })
+    .catch(() => {
+      if (!mounted) return;
+      setLoading(false);
+    });
+    return () => { mounted = false; };
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className={styles.notFound}>
+        <h2>Cargando...</h2>
+      </div>
+    );
+  }
 
   if (!champion) {
     return (

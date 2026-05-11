@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { mockMetaByPatch, mockCompetitivePatches } from '../data/mockData';
+import { getTournamentWinrates, getAllChampions } from '../services/mongoService';
 import styles from './Meta.module.css';
 
 const PATCHES = Object.keys(mockMetaByPatch);
@@ -15,11 +16,29 @@ export default function Meta() {
   const [patch, setPatch] = useState(PATCHES[0]);
   const [sort, setSort] = useState('pick_rate');
   const [view, setView] = useState('table');
+  const [mongoProStats, setMongoProStats] = useState([]);
+
+  useEffect(() => {
+    Promise.all([
+      getTournamentWinrates('14.6'),
+      getAllChampions(),
+    ]).then(([winrateData, champData]) => {
+      if (winrateData && winrateData.length > 0) {
+        // Crear mapa de championId -> nombre
+        const champMap = {};
+        champData?.forEach(c => { champMap[c.championId] = c.name; });
+
+        setMongoProStats(winrateData.map(w => ({
+          champion: champMap[w._id] || w._id, // nombre si existe, si no el id
+          picks: w.totalPicks,
+          winrate: w.winrate,
+        })));
+      }
+    });
+  }, []);
 
   const data = [...(mockMetaByPatch[patch] || [])].sort((a, b) => b[`global_${sort}`] - a[`global_${sort}`]);
-
   const compData = mockCompetitivePatches.find((p) => p.patchId === patch);
-  const proStats = compData ? computeProStats(compData.picks) : [];
 
   return (
     <div className={styles.page}>
@@ -118,12 +137,14 @@ export default function Meta() {
         </div>
       )}
 
-      {proStats.length > 0 && (
+      {mongoProStats.length > 0 && (
         <div className={styles.proSection}>
-          <h2 className={styles.sectionTitle}>Pro Play — Picks competitivos en {compData?.tournament}</h2>
-          <p className={styles.sectionSub}>MongoDB — competitive_patches aggregate por campeón</p>
+          <h2 className={styles.sectionTitle}>
+            Pro Play — Picks competitivos en {compData?.tournament || 'LCK_Spring_2024'}
+          </h2>
+          <p className={styles.sectionSub}>MongoDB — pipeline de agregación sobre competitive_patches</p>
           <div className={styles.proGrid}>
-            {proStats.map((s) => (
+            {mongoProStats.map((s) => (
               <div key={s.champion} className={styles.proCard}>
                 <div className={styles.proName}>{s.champion}</div>
                 <div className={styles.proStats}>

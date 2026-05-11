@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { mockChampions } from '../data/mockData';
+import { getAllChampions } from '../services/mongoService';
 import styles from './Champions.module.css';
 
 const ALL_ROLES = ['ALL', 'TOP', 'JUNGLE', 'MID', 'BOT', 'SUPPORT'];
@@ -17,7 +18,19 @@ export default function Champions() {
   const [search, setSearch] = useState('');
   const [role, setRole] = useState('ALL');
 
-  const filtered = mockChampions.filter((c) => {
+  const [champions, setChampions] = useState(mockChampions);
+  useEffect(() => {
+    let mounted = true;
+    getAllChampions().then((data) => {
+      if (!mounted) return;
+      if (Array.isArray(data) && data.length > 0) setChampions(data);
+    }).catch(() => {
+      // keep fallback mock data
+    });
+    return () => { mounted = false; };
+  }, []);
+
+  const filtered = champions.filter((c) => {
     const matchSearch = c.name.toLowerCase().includes(search.toLowerCase());
     const matchRole = role === 'ALL' || c.roles.includes(role);
     return matchSearch && matchRole;
@@ -30,7 +43,7 @@ export default function Champions() {
 
       <div className={styles.controls}>
         <input
-          className={styles.searchInput}
+          className={styles.searchInput}S
           placeholder="Buscar campeón..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}

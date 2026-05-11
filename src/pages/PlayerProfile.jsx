@@ -3,8 +3,9 @@ import { useParams, Link } from 'react-router-dom';
 import {
   LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
 } from 'recharts';
-import { mockPlayers, mockPerformance, mockRankHistory } from '../data/mockData';
+import { mockPerformance, mockRankHistory } from '../data/mockData';
 import { getPlayerMains } from '../services/dgraphService';
+import { syncPlayerProfile, getMatchesByPuuid } from '../services/mongoService';
 import styles from './PlayerProfile.module.css';
 
 const TIER_ORDER = { IRON: 0, BRONZE: 1, SILVER: 2, GOLD: 3, PLATINUM: 4, EMERALD: 5, DIAMOND: 6, MASTER: 7, GRANDMASTER: 8, CHALLENGER: 9 };
@@ -14,24 +15,60 @@ function lpsForChart(tier, lp) {
 }
 
 export default function PlayerProfile() {
-  const { name } = useParams();
-  const player = mockPlayers[name];
-  const perf = player ? mockPerformance[player.puuid] : null;
-  const history = player ? (mockRankHistory[player.puuid] || []) : [];
-
+  const { gameName, tagLine } = useParams();
+  const [player, setPlayer] = useState(null);
+  const [matches, setMatches] = useState([]);
   const [mains, setMains] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!player) return;
-    getPlayerMains(player.puuid).then(setMains);
-  }, [player?.puuid]);
+    if (!gameName || !tagLine) return;
+    let mounted = true;
+
+    Promise.all([
+      syncPlayerProfile(gameName, tagLine),
+      getPlayerMains(gameName).catch(() => []),
+    ]).then(([playerData, mainsData]) => {
+      if (!mounted) return;
+      setPlayer(playerData || null);
+      setMains(mainsData || []);
+      setLoading(false);
+
+      if (playerData?.puuid) {
+        // Primer fetch inmediato
+        getMatchesByPuuid(playerData.puuid).then(setMatches);
+        
+        // Segundo fetch después de 3 segundos para agarrar las que se están sincronizando
+        setTimeout(() => {
+          if (!mounted) return;
+          getMatchesByPuuid(playerData.puuid).then(setMatches);
+        }, 3000);
+      }
+    }).catch(() => {
+      if (!mounted) return;
+      setLoading(false);
+    });
+
+    return () => { mounted = false; };
+  }, [gameName, tagLine]);
+
+  const perf = player ? (mockPerformance[player.puuid] || mockPerformance['default']) : null;
+  const history = player ? (mockRankHistory[player.puuid] || mockRankHistory['default'] || []) : [];
+
+  if (loading) {
+    return (
+      <div className={styles.notFound}>
+        <h2>Buscando perfil...</h2>
+      </div>
+    );
+  }
 
   if (!player) {
     return (
       <div className={styles.notFound}>
         <h2>Jugador no encontrado</h2>
-        <p>No existe un perfil mock para <strong>{name}</strong>.</p>
-        <p>Prueba con: Faker, Caps, Ruler o Chovy.</p>
+        <p>No se encontró el perfil de <strong>{gameName}#{tagLine}</strong>.</p>
+        <p>Verifica que el nombre y tag sean correctos.</p>
         <Link to="/" className={styles.backLink}>← Volver al inicio</Link>
       </div>
     );
@@ -45,41 +82,46 @@ export default function PlayerProfile() {
     label: `${h.tier.slice(0, 2)} ${h.league_points}LP`,
   }));
 
-  const [k, d, a] = perf.avgKDA.split('/').map(Number);
+  const kdaDisplay = perf?.avgKDA || '0/0/0';
+  const [k, d, a] = kdaDisplay.split('/').map(Number);
   const kda = d === 0 ? 'Perfect' : ((k + a) / d).toFixed(2);
 
   return (
     <div className={styles.page}>
       <div className={styles.header}>
         <div className={styles.avatar}>
-          <span className={styles.avatarText}>{player.summonerName[0]}</span>
+          <span className={styles.avatarText}>{player.summonerName?.[0] || '?'}</span>
         </div>
         <div className={styles.headerInfo}>
           <div className={styles.nameRow}>
             <h1 className={styles.summonerName}>{player.summonerName}</h1>
             <span className={styles.tag}>#{player.tag}</span>
             <span className={`${styles.regionBadge} ${styles['region_' + player.region]}`}>
-              {player.region}
+              {player.region?.toUpperCase()}
             </span>
           </div>
           <div className={styles.metaRow}>
             <span>Nivel <strong>{player.summonerLevel}</strong></span>
-            <span>PUUID: <code className={styles.code}>{player.puuid.slice(0, 18)}…</code></span>
+            <span>PUUID: <code className={styles.code}>{player.puuid?.slice(0, 18)}…</code></span>
           </div>
-          <div className={styles.roleList}>
-            {perf.preferredRoles.map((r) => (
-              <span key={r} className={`${styles.roleBadge} ${styles['role_' + r]}`}>{r}</span>
-            ))}
-          </div>
+          {perf && (
+            <div className={styles.roleList}>
+              {perf.preferredRoles.map((r) => (
+                <span key={r} className={`${styles.roleBadge} ${styles['role_' + r]}`}>{r}</span>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
-      <div className={styles.statsGrid}>
-        <StatCard label="KDA Ratio" value={kda} sub={perf.avgKDA} color="#c89b3c" />
-        <StatCard label="Winrate" value={`${(perf.winrate * 100).toFixed(1)}%`} sub="Ranked Solo" color={perf.winrate >= 0.5 ? '#00d4a0' : '#e84057'} />
-        <StatCard label="Daño Prom." value={perf.avgDamage.toLocaleString()} sub="por partida" color="#0bc4e3" />
-        <StatCard label="CS / Min" value={perf.avgCSPerMin.toFixed(1)} sub="minions/jungle" color="#a78bfa" />
-      </div>
+      {perf && (
+        <div className={styles.statsGrid}>
+          <StatCard label="KDA Ratio" value={kda} sub={kdaDisplay} color="#c89b3c" />
+          <StatCard label="Winrate" value={`${(perf.winrate * 100).toFixed(1)}%`} sub="Ranked Solo" color={perf.winrate >= 0.5 ? '#00d4a0' : '#e84057'} />
+          <StatCard label="Daño Prom." value={perf.avgDamage.toLocaleString()} sub="por partida" color="#0bc4e3" />
+          <StatCard label="CS / Min" value={perf.avgCSPerMin.toFixed(1)} sub="minions/jungle" color="#a78bfa" />
+        </div>
+      )}
 
       <div className={styles.twoCol}>
         <div className={styles.card}>
@@ -106,21 +148,25 @@ export default function PlayerProfile() {
 
         <div className={styles.card}>
           <h2 className={styles.cardTitle}>Partidas Recientes</h2>
-          <p className={styles.cardSub}>Fuente: MongoDB — recentPerformance</p>
-          <div className={styles.matchList}>
-            {perf.recentPerformance.map((m) => (
-              <div key={m.matchId} className={`${styles.matchRow} ${m.win ? styles.matchWin : styles.matchLoss}`}>
-                <span className={m.win ? styles.winPill : styles.lossPill}>{m.win ? 'W' : 'L'}</span>
-                <div className={styles.matchInfo}>
-                  <span className={styles.matchKda}>{m.kda}</span>
-                  <span className={styles.matchId}>{m.matchId}</span>
+          <p className={styles.cardSub}>Fuente: MongoDB — matches</p>
+          {matches.length > 0 ? (
+            <div className={styles.matchList}>
+              {matches.map((m) => (
+                <div key={m.matchId} className={`${styles.matchRow} ${m.win ? styles.matchWin : styles.matchLoss}`}>
+                  <span className={m.win ? styles.winPill : styles.lossPill}>{m.win ? 'W' : 'L'}</span>
+                  <div className={styles.matchInfo}>
+                    <span className={styles.matchKda}>{m.champion} — {m.kills}/{m.deaths}/{m.assists}</span>
+                    <span className={styles.matchId}>{m.gameMode}</span>
+                  </div>
+                  <span className={styles.matchTime}>
+                    {new Date(m.createdAt).toLocaleDateString('es-MX', { month: 'short', day: 'numeric' })}
+                  </span>
                 </div>
-                <span className={styles.matchTime}>
-                  {new Date(m.timestamp).toLocaleDateString('es-MX', { month: 'short', day: 'numeric' })}
-                </span>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <p className={styles.empty}>Sin partidas recientes.</p>
+          )}
         </div>
       </div>
 

@@ -15,8 +15,16 @@ export default function Home() {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    const name = query.trim();
-    if (name) navigate(`/player/${encodeURIComponent(name)}`);
+    const input = query.trim();
+    if (!input) return;
+    
+    const [gameName, tagLine] = input.split('#');
+    if (!gameName || !tagLine) {
+      alert('Formato inválido. Usa: NombreJugador#TAG (ej. Faker#KR1)');
+      return;
+    }
+
+    navigate(`/player/${encodeURIComponent(gameName)}/${encodeURIComponent(tagLine)}`);
   };
 
   return (

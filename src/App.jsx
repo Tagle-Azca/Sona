@@ -16,7 +16,7 @@ export default function App() {
       <main style={{ flex: 1 }}>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/player/:name" element={<PlayerProfile />} />
+          <Route path="/player/:gameName/:tagLine" element={<PlayerProfile />} />
           <Route path="/champions" element={<Champions />} />
           <Route path="/champions/:id" element={<ChampionDetail />} />
           <Route path="/pro" element={<ProScene />} />
