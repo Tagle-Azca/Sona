@@ -68,3 +68,20 @@ export function getTournamentResults(tournamentId) {
 export function getPlayerStats(puuid) {
     return safeFetch(`${BASE}/api/player/${puuid}/stats`, null);
 }
+
+export function getSettings() {
+    return safeFetch(`${BASE}/api/settings`, null);
+}
+
+export async function updateSettings(id, data) {
+    const res = await fetch(`${BASE}/api/settings/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+    });
+    return res.json();
+}
+
+export function getMatchById(matchId) {
+    return safeFetch(`${BASE}/api/match/detail/${matchId}`, null);
+}

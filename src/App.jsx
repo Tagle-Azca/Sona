@@ -8,6 +8,8 @@ import ProScene from './pages/ProScene';
 import Meta from './pages/Meta';
 import Tournaments from './pages/Tournaments';
 import GraphExplorer from './pages/GraphExplorer';
+import Settings from './pages/Settings';
+import MatchDetail from './pages/MatchDetail';
 
 export default function App() {
   return (
@@ -23,6 +25,8 @@ export default function App() {
           <Route path="/meta" element={<Meta />} />
           <Route path="/tournaments" element={<Tournaments />} />
           <Route path="/graph" element={<GraphExplorer />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/match/:matchId" element={<MatchDetail />} />
         </Routes>
       </main>
     </BrowserRouter>

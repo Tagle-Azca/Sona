@@ -42,7 +42,7 @@ export default function PlayerProfile() {
           if (!raw || !raw[0]) return;
           const s = raw[0].stats?.[0];
           setStats(s ?? null);
-        }, 3000);
+        }, 6000);
         
         // Segundo fetch después de 3 segundos para agarrar las que se están sincronizando
         setTimeout(() => {
@@ -157,7 +157,8 @@ export default function PlayerProfile() {
               {matches.map((m) => {
                 const me = m.participants?.find(p => p.puuid === player.puuid);
                   return (
-                      <div key={m.matchId} className={`${styles.matchRow} ${me?.win ? styles.matchWin : styles.matchLoss}`}>
+                    <Link key={m.matchId} to={`/match/${m.matchId}`} style={{ textDecoration: 'none' }}>
+                      <div className={`${styles.matchRow} ${me?.win ? styles.matchWin : styles.matchLoss}`}>
                           <span className={me?.win ? styles.winPill : styles.lossPill}>{me?.win ? 'W' : 'L'}</span>
                           <div className={styles.matchInfo}>
                               <span className={styles.matchKda}>{me?.champion} — {me?.kills}/{me?.deaths}/{me?.assists}</span>
@@ -167,6 +168,7 @@ export default function PlayerProfile() {
                               {new Date(m.createdAt).toLocaleDateString('es-MX', { month: 'short', day: 'numeric' })}
                           </span>
                       </div>
+                    </Link>
                   );
               })}
             </div>
