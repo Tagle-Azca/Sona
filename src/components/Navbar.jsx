@@ -9,6 +9,7 @@ const links = [
   { to: '/meta', label: 'Meta' },
   { to: '/tournaments', label: 'Torneos' },
   { to: '/graph', label: 'Grafo' },
+  { to: '/settings', label: 'Settings' },
 ];
 
 export default function Navbar() {
