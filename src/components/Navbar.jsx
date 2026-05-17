@@ -3,7 +3,7 @@ import styles from './Navbar.module.css';
 
 const links = [
   { to: '/', label: 'Home' },
-  { to: '/player/Faker', label: 'Jugador' },
+  { to: '/player/Faker/KR1', label: 'Jugador' },
   { to: '/champions', label: 'Campeones' },
   { to: '/pro', label: 'Pro Scene' },
   { to: '/meta', label: 'Meta' },
