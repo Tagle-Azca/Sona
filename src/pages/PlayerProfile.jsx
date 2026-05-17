@@ -5,7 +5,7 @@ import {
 } from 'recharts';
 import { mockPerformance, mockRankHistory } from '../data/mockData';
 import { getPlayerMains } from '../services/dgraphService';
-import { syncPlayerProfile, getMatchesByPuuid } from '../services/mongoService';
+import { syncPlayerProfile, getMatchesByPuuid, getPlayerStats } from '../services/mongoService';
 import styles from './PlayerProfile.module.css';
 
 const TIER_ORDER = { IRON: 0, BRONZE: 1, SILVER: 2, GOLD: 3, PLATINUM: 4, EMERALD: 5, DIAMOND: 6, MASTER: 7, GRANDMASTER: 8, CHALLENGER: 9 };
@@ -20,6 +20,7 @@ export default function PlayerProfile() {
   const [matches, setMatches] = useState([]);
   const [mains, setMains] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState(null);
 
   useEffect(() => {
     if (!gameName || !tagLine) return;
@@ -37,6 +38,11 @@ export default function PlayerProfile() {
       if (playerData?.puuid) {
         // Primer fetch inmediato
         getMatchesByPuuid(playerData.puuid).then(setMatches);
+        getPlayerStats(playerData.puuid).then(raw => {
+          if (!raw || !raw[0]) return;
+          const s = raw[0].stats?.[0];
+          setStats(s ?? null);
+        }, 3000);
         
         // Segundo fetch después de 3 segundos para agarrar las que se están sincronizando
         setTimeout(() => {
@@ -52,7 +58,6 @@ export default function PlayerProfile() {
     return () => { mounted = false; };
   }, [gameName, tagLine]);
 
-  const perf = player ? (mockPerformance[player.puuid] || mockPerformance['default']) : null;
   const history = player ? (mockRankHistory[player.puuid] || mockRankHistory['default'] || []) : [];
 
   if (loading) {
@@ -82,9 +87,7 @@ export default function PlayerProfile() {
     label: `${h.tier.slice(0, 2)} ${h.league_points}LP`,
   }));
 
-  const kdaDisplay = perf?.avgKDA || '0/0/0';
-  const [k, d, a] = kdaDisplay.split('/').map(Number);
-  const kda = d === 0 ? 'Perfect' : ((k + a) / d).toFixed(2);
+  const kda = stats?.avgKDA?.toFixed(2) ?? '—';
 
   return (
     <div className={styles.page}>
@@ -104,9 +107,9 @@ export default function PlayerProfile() {
             <span>Nivel <strong>{player.summonerLevel}</strong></span>
             <span>PUUID: <code className={styles.code}>{player.puuid?.slice(0, 18)}…</code></span>
           </div>
-          {perf && (
+          {stats && (
             <div className={styles.roleList}>
-              {perf.preferredRoles.map((r) => (
+              {stats?.preferredRoles?.map((r) => (
                 <span key={r} className={`${styles.roleBadge} ${styles['role_' + r]}`}>{r}</span>
               ))}
             </div>
@@ -114,12 +117,12 @@ export default function PlayerProfile() {
         </div>
       </div>
 
-      {perf && (
+      {stats && (
         <div className={styles.statsGrid}>
-          <StatCard label="KDA Ratio" value={kda} sub={kdaDisplay} color="#c89b3c" />
-          <StatCard label="Winrate" value={`${(perf.winrate * 100).toFixed(1)}%`} sub="Ranked Solo" color={perf.winrate >= 0.5 ? '#00d4a0' : '#e84057'} />
-          <StatCard label="Daño Prom." value={perf.avgDamage.toLocaleString()} sub="por partida" color="#0bc4e3" />
-          <StatCard label="CS / Min" value={perf.avgCSPerMin.toFixed(1)} sub="minions/jungle" color="#a78bfa" />
+          <StatCard label="KDA Ratio" value={kda} sub="por partida" color="#c89b3c" />
+          <StatCard label="Winrate" value={`${(stats.winrate * 100).toFixed(1)}%`} sub="Ranked Solo" color={stats.winrate >= 0.5 ? '#00d4a0' : '#e84057'} />
+          <StatCard label="Daño Prom." value={(stats.avgDamage ?? 0).toLocaleString()} sub="por partida" color="#0bc4e3" />
+          <StatCard label="CS / Min" value={(stats.avgCSPerMin ?? 0).toFixed(1)} sub="minions/jungle" color="#a78bfa" />
         </div>
       )}
 
@@ -151,18 +154,21 @@ export default function PlayerProfile() {
           <p className={styles.cardSub}>Fuente: MongoDB — matches</p>
           {matches.length > 0 ? (
             <div className={styles.matchList}>
-              {matches.map((m) => (
-                <div key={m.matchId} className={`${styles.matchRow} ${m.win ? styles.matchWin : styles.matchLoss}`}>
-                  <span className={m.win ? styles.winPill : styles.lossPill}>{m.win ? 'W' : 'L'}</span>
-                  <div className={styles.matchInfo}>
-                    <span className={styles.matchKda}>{m.champion} — {m.kills}/{m.deaths}/{m.assists}</span>
-                    <span className={styles.matchId}>{m.gameMode}</span>
-                  </div>
-                  <span className={styles.matchTime}>
-                    {new Date(m.createdAt).toLocaleDateString('es-MX', { month: 'short', day: 'numeric' })}
-                  </span>
-                </div>
-              ))}
+              {matches.map((m) => {
+                const me = m.participants?.find(p => p.puuid === player.puuid);
+                  return (
+                      <div key={m.matchId} className={`${styles.matchRow} ${me?.win ? styles.matchWin : styles.matchLoss}`}>
+                          <span className={me?.win ? styles.winPill : styles.lossPill}>{me?.win ? 'W' : 'L'}</span>
+                          <div className={styles.matchInfo}>
+                              <span className={styles.matchKda}>{me?.champion} — {me?.kills}/{me?.deaths}/{me?.assists}</span>
+                              <span className={styles.matchId}>{m.gameMode}</span>
+                          </div>
+                          <span className={styles.matchTime}>
+                              {new Date(m.createdAt).toLocaleDateString('es-MX', { month: 'short', day: 'numeric' })}
+                          </span>
+                      </div>
+                  );
+              })}
             </div>
           ) : (
             <p className={styles.empty}>Sin partidas recientes.</p>

@@ -4,7 +4,7 @@ import styles from './Home.module.css';
 
 const STATS = [
   { label: 'Partidas Analizadas', value: '2.4M+', icon: 'fi-rr-gamepad' },
-  { label: 'Campeones', value: '168', icon: 'fi-rr-sword' },
+  { label: 'Campeones', value: '172', icon: 'fi-rr-sword' },
   { label: 'Pro Players', value: '500+', icon: 'fi-rr-trophy' },
   { label: 'Regiones', value: '12', icon: 'fi-rr-globe' },
 ];
@@ -44,7 +44,7 @@ export default function Home() {
           <form className={styles.search} onSubmit={handleSearch}>
             <input
               className={styles.searchInput}
-              placeholder="Buscar invocador (ej. Faker, Caps, Ruler)..."
+              placeholder="Buscar invocador (ej. Faker#KR1, Caps#EUW)..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
             />
@@ -53,13 +53,18 @@ export default function Home() {
             </button>
           </form>
           <div className={styles.quickLinks}>
-            {['Faker', 'Caps', 'Chovy', 'Ruler'].map((name) => (
+            {[
+              { gameName: 'Faker', tagLine: 'KR1' },
+              { gameName: 'Caps', tagLine: 'EUW' },
+              { gameName: 'Chovy', tagLine: 'KR2' },
+              { gameName: 'Ruler', tagLine: 'KR4' },
+            ].map(({ gameName, tagLine }) => (
               <button
-                key={name}
+                key={`${gameName}#${tagLine}`}
                 className={styles.quickChip}
-                onClick={() => navigate(`/player/${name}`)}
+                onClick={() => navigate(`/player/${encodeURIComponent(gameName)}/${encodeURIComponent(tagLine)}`)}
               >
-                {name}
+                {gameName}
               </button>
             ))}
           </div>
@@ -83,7 +88,7 @@ export default function Home() {
           icon="fi-rr-chart-histogram"
           title="Perfiles de Jugadores"
           desc="KDA promedio, winrate, roles preferidos, historial reciente y evolución de rank."
-          link="/player/Faker"
+          link="/player/Faker/KR1"
           linkLabel="Ver perfil de Faker →"
         />
         <SectionCard
