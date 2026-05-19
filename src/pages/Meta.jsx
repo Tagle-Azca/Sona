@@ -14,13 +14,14 @@ function winColor(rate) {
 
 export default function Meta() {
   const [patch, setPatch] = useState(PATCHES[0]);
+  const [mongoPatch, setMongoPatch] = useState('14.10');
   const [sort, setSort] = useState('pick_rate');
   const [view, setView] = useState('table');
   const [mongoProStats, setMongoProStats] = useState([]);
 
   useEffect(() => {
     Promise.all([
-      getTournamentWinrates('14.6'),
+      getTournamentWinrates(mongoPatch),
       getAllChampions(),
     ]).then(([winrateData, champData]) => {
       if (winrateData && winrateData.length > 0) {
@@ -35,7 +36,7 @@ export default function Meta() {
         })));
       }
     });
-  }, []);
+  }, [mongoPatch]);
 
   const data = [...(mockMetaByPatch[patch] || [])].sort((a, b) => b[`global_${sort}`] - a[`global_${sort}`]);
   const compData = mockCompetitivePatches.find((p) => p.patchId === patch);
