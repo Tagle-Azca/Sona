@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { mockChampions, mockSynergies, mockCounters } from '../data/mockData';
-import { getChampionSynergies, getChampionCounters } from '../services/dgraphService';
+import { getChampionGraph } from '../services/dgraphService';
 import { getChampionById } from '../services/mongoService';
 import styles from './ChampionDetail.module.css';
 
@@ -22,14 +22,13 @@ export default function ChampionDetail() {
 
     Promise.all([
       getChampionById(id),
-      getChampionSynergies(id).catch(() => []),
-      getChampionCounters(id).catch(() => []),
-    ]).then(([champData, syns, ctrs]) => {
-    if (!mounted) return;
-    setChampion(champData || null);
-    setSynergies(syns);
-    setCounters(ctrs);
-    setLoading(false);
+      getChampionGraph(id).catch(() => ({ synergies: [], counters: [] })),
+    ]).then(([champData, graphData]) => {
+      if (!mounted) return;
+      setChampion(champData || null);
+      setSynergies(graphData.synergies);
+      setCounters(graphData.counters);
+      setLoading(false);
     })
     .catch(() => {
       if (!mounted) return;
@@ -109,12 +108,21 @@ export default function ChampionDetail() {
 
       {synergies.length > 0 && (
         <div className={styles.card}>
-          <h2 className={styles.cardTitle}>Sinergias (Dgraph — SYNERGIZES_WITH)</h2>
-          <p className={styles.cardSub}>Mejores compañeros de equipo para {champion.name}</p>
+          <div className={styles.cardTitleRow}>
+            <h2 className={styles.cardTitle}>Sinergias</h2>
+            <span className={styles.edgeBadge} style={{ color: '#00d4a0', borderColor: 'rgba(0,212,160,0.25)', background: 'rgba(0,212,160,0.06)' }}>
+              {champion.name} ↔ SYNERGIZES_WITH ↔ Champion
+            </span>
+          </div>
+          <p className={styles.cardSub}>Mejores compañeros de equipo — Dgraph</p>
           <div className={styles.relGrid}>
             {synergies.map((s) => (
               <div key={s.champion} className={styles.relCard}>
-                <div className={styles.relName}>{s.champion}</div>
+                <div className={styles.relEdgePath}>
+                  <span className={styles.relPathNode}>{champion.name}</span>
+                  <span className={styles.relPathArrow}>↔</span>
+                  <span className={styles.relPathNode}>{s.champion}</span>
+                </div>
                 <div className={styles.relStats}>
                   <div><span className={styles.relLabel}>Win rate</span><span className={styles.relVal} style={{ color: '#00d4a0' }}>{s.winRate}%</span></div>
                   <div><span className={styles.relLabel}>Partidas</span><span className={styles.relVal}>{s.gamesPlayed}</span></div>
@@ -128,12 +136,21 @@ export default function ChampionDetail() {
 
       {counters.length > 0 && (
         <div className={styles.card}>
-          <h2 className={styles.cardTitle}>Counters recibidos (Dgraph — COUNTERS)</h2>
-          <p className={styles.cardSub}>Campeones que favorecen a {champion.name} en duelos directos</p>
+          <div className={styles.cardTitleRow}>
+            <h2 className={styles.cardTitle}>Counters recibidos</h2>
+            <span className={styles.edgeBadge} style={{ color: '#e84057', borderColor: 'rgba(232,64,87,0.25)', background: 'rgba(232,64,87,0.06)' }}>
+              Champion → COUNTERS → {champion.name}
+            </span>
+          </div>
+          <p className={styles.cardSub}>Campeones que ganan en duelo directo — Dgraph</p>
           <div className={styles.relGrid}>
             {counters.map((c) => (
               <div key={c.champion} className={`${styles.relCard} ${styles.counterCard}`}>
-                <div className={styles.relName}>{c.champion}</div>
+                <div className={styles.relEdgePath}>
+                  <span className={styles.relPathNode}>{c.champion}</span>
+                  <span className={styles.relPathArrow} style={{ color: '#e84057' }}>→</span>
+                  <span className={styles.relPathNode}>{champion.name}</span>
+                </div>
                 <div className={styles.relStats}>
                   <div><span className={styles.relLabel}>Win rate favor</span><span className={styles.relVal} style={{ color: '#e84057' }}>{c.winRateFavor}%</span></div>
                   <div><span className={styles.relLabel}>Matchups</span><span className={styles.relVal}>{c.matchups}</span></div>
@@ -147,7 +164,7 @@ export default function ChampionDetail() {
 
       {synergies.length === 0 && counters.length === 0 && (
         <div className={styles.card}>
-          <p className={styles.noData}>Sin datos de grafo para este campeón aún.</p>
+          <p className={styles.noData}>Las relaciones de este campeón se calculan al procesar partidas reales — sin datos aún.</p>
         </div>
       )}
     </div>

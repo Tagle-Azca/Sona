@@ -1,7 +1,3 @@
-/**
- * Capa de acceso a la API de Dgraph.
- * Si la llamada falla, devuelve los datos mock como fallback.
- */
 import { mockSynergies, mockCounters, mockProTeams, mockChampions, mockPlayers } from '../data/mockData.js';
 
 const BASE = import.meta.env.VITE_API_URL || 'http://localhost:3000';
@@ -17,65 +13,44 @@ async function safeFetch(url, fallback) {
   }
 }
 
-// ─── Champion ────────────────────────────────────────────────────────────────
+// ─── Champion ─────────────────────────────────────────────────────────────────
+// One query: synergies + counters
 
-export function getChampionSynergies(championId) {
-  return safeFetch(
-    `${BASE}/api/graph/champion/${championId}/synergies`,
-    mockSynergies[championId] || []
-  );
+export async function getChampionGraph(championId) {
+  const data = await safeFetch(`${BASE}/api/graph/champion/${championId}`, null);
+  if (data) return data;
+  return {
+    synergies: (mockSynergies[championId] || []),
+    counters:  (mockCounters[championId]  || []),
+  };
 }
 
-export function getChampionCounters(championId) {
-  return safeFetch(
-    `${BASE}/api/graph/champion/${championId}/counters`,
-    mockCounters[championId] || []
-  );
+// ─── Player ───────────────────────────────────────────────────────────────────
+// One query: mains + network
+
+export function getPlayerOverview(puuid) {
+  return safeFetch(`${BASE}/api/graph/player/${puuid}/overview`, { mains: [], network: [] });
 }
 
-// ─── Player ──────────────────────────────────────────────────────────────────
-
-export function getPlayerMains(puuid) {
-  return safeFetch(`${BASE}/api/graph/player/${puuid}/mains`, []);
-}
-
-export function getPlayerNetwork(puuid) {
-  return safeFetch(`${BASE}/api/graph/player/${puuid}/network`, []);
-}
-
-// ─── Pro ─────────────────────────────────────────────────────────────────────
+// ─── Pro ──────────────────────────────────────────────────────────────────────
+// One query: flat team list with rosters
 
 export async function getProTeams() {
-  const orgs = await safeFetch(`${BASE}/api/graph/pro/org`, null);
-  if (!orgs) return mockProTeams;
-
-  return orgs.flatMap((org) =>
-    (org.teams || []).map((team) => ({
-      teamId: team.teamId,
-      name: team.teamName,
-      region: team.region,
-      roster: (team.players || []).map((p) => ({
-        proPlayerId: p.proPlayerId,
-        username: p.proName,
-        role: p.role,
-      })),
-    }))
-  );
+  const data = await safeFetch(`${BASE}/api/graph/pro/teams`, null);
+  return data ?? mockProTeams;
 }
 
-export function getProCareer(proPlayerId) {
-  return safeFetch(`${BASE}/api/graph/pro/player/${proPlayerId}/career`, null);
-}
+// One query: career + rivalries
 
-export function getProRivalry(proPlayerId) {
-  return safeFetch(`${BASE}/api/graph/pro/rivalry/${proPlayerId}`, null);
+export function getProProfile(proPlayerId) {
+  return safeFetch(`${BASE}/api/graph/pro/player/${proPlayerId}`, null);
 }
 
 // ─── Full graph ───────────────────────────────────────────────────────────────
 
 function buildMockGraph() {
   const nodesMap = new Map();
-  const links = [];
+  const links    = [];
 
   function node(id, name, type) {
     if (!nodesMap.has(id)) nodesMap.set(id, { id, name, type });
@@ -86,12 +61,12 @@ function buildMockGraph() {
 
   mockChampions.forEach((c) => node(c.championId, c.name, 'Champion'));
 
-  Object.entries(mockSynergies).forEach(([champ, syns]) => {
-    syns.forEach((s) => link(champ, s.champion, 'SYNERGIZES_WITH'));
-  });
-  Object.entries(mockCounters).forEach(([champ, ctrs]) => {
-    ctrs.forEach((c) => link(c.champion, champ, 'COUNTERS'));
-  });
+  Object.entries(mockSynergies).forEach(([champ, syns]) =>
+    syns.forEach((s) => link(champ, s.champion, 'SYNERGIZES_WITH'))
+  );
+  Object.entries(mockCounters).forEach(([champ, ctrs]) =>
+    ctrs.forEach((c) => link(c.champion, champ, 'COUNTERS'))
+  );
 
   Object.values(mockPlayers).forEach((p) => node(p.puuid, p.summonerName, 'Player'));
 

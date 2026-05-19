@@ -4,7 +4,7 @@ import {
   LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
 } from 'recharts';
 import { mockPerformance, mockRankHistory } from '../data/mockData';
-import { getPlayerMains } from '../services/dgraphService';
+import { getPlayerOverview } from '../services/dgraphService';
 import { syncPlayerProfile, getMatchesByPuuid, getPlayerStats } from '../services/mongoService';
 import styles from './PlayerProfile.module.css';
 
@@ -16,40 +16,44 @@ function lpsForChart(tier, lp) {
 
 export default function PlayerProfile() {
   const { gameName, tagLine } = useParams();
-  const [player, setPlayer] = useState(null);
+  const [player, setPlayer]   = useState(null);
   const [matches, setMatches] = useState([]);
-  const [mains, setMains] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [stats, setStats] = useState(null);
+  const [mains, setMains]       = useState([]);
+  const [network, setNetwork]   = useState([]);
+  const [loading, setLoading]   = useState(true);
+  const [stats, setStats]       = useState(null);
 
   useEffect(() => {
     if (!gameName || !tagLine) return;
     let mounted = true;
 
-    Promise.all([
-      syncPlayerProfile(gameName, tagLine),
-      getPlayerMains(gameName).catch(() => []),
-    ]).then(([playerData, mainsData]) => {
+    syncPlayerProfile(gameName, tagLine).then((playerData) => {
       if (!mounted) return;
       setPlayer(playerData || null);
-      setMains(mainsData || []);
       setLoading(false);
 
-      if (playerData?.puuid) {
-        // Primer fetch inmediato
+      if (!playerData?.puuid) return;
+
+      // puuid ya disponible — lanzar las 3 queries en paralelo
+      Promise.all([
+        getMatchesByPuuid(playerData.puuid),
+        getPlayerOverview(playerData.puuid).catch(() => ({ mains: [], network: [] })),
+      ]).then(([matchData, graphData]) => {
+        if (!mounted) return;
+        setMatches(matchData || []);
+        setMains(graphData.mains || []);
+        setNetwork(graphData.network || []);
+      });
+
+      // segundo fetch de partidas tras 3s para capturar las que aún se sincronizan
+      setTimeout(() => {
+        if (!mounted) return;
         getMatchesByPuuid(playerData.puuid).then(setMatches);
-        getPlayerStats(playerData.puuid).then(raw => {
-          if (!raw || !raw[0]) return;
-          const s = raw[0].stats?.[0];
-          setStats(s ?? null);
-        }, 6000);
-        
-        // Segundo fetch después de 3 segundos para agarrar las que se están sincronizando
-        setTimeout(() => {
-          if (!mounted) return;
-          getMatchesByPuuid(playerData.puuid).then(setMatches);
-        }, 3000);
-      }
+        getPlayerStats(playerData.puuid).then((raw) => {
+          if (!mounted || !raw?.[0]) return;
+          setStats(raw[0].stats?.[0] ?? null);
+        });
+      }, 3000);
     }).catch(() => {
       if (!mounted) return;
       setLoading(false);
@@ -180,18 +184,49 @@ export default function PlayerProfile() {
 
       {mains.length > 0 && (
         <div className={styles.card}>
-          <h2 className={styles.cardTitle}>Pool de Campeones (Dgraph — MAINS)</h2>
-          <p className={styles.cardSub}>Campeones más jugados por {player.summonerName}</p>
+          <div className={styles.cardTitleRow}>
+            <h2 className={styles.cardTitle}>Pool de Campeones</h2>
+            <span className={styles.edgeBadge}>Player → MAINS → Champion</span>
+          </div>
+          <p className={styles.cardSub}>Campeones más jugados por {player.summonerName} — Dgraph</p>
           <div className={styles.mainsGrid}>
             {mains.map((m) => (
               <div key={m.championId} className={styles.mainCard}>
-                <div className={styles.mainRank}>#{m.rank}</div>
+                <div className={styles.mainRank}>{m.rank}</div>
                 <div className={styles.mainName}>{m.name}</div>
                 <div className={styles.mainStats}>
                   <div><span className={styles.relLabel}>Partidas</span><span className={styles.relVal}>{m.gamesPlayed}</span></div>
                   <div><span className={styles.relLabel}>Win rate</span><span className={styles.relVal} style={{ color: m.winRate >= 0.5 ? '#00d4a0' : '#e84057' }}>{(m.winRate * 100).toFixed(0)}%</span></div>
                   <div><span className={styles.relLabel}>KDA</span><span className={styles.relVal}>{m.avgKDA}</span></div>
                   <div><span className={styles.relLabel}>CS/min</span><span className={styles.relVal}>{m.avgCSPerMin}</span></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {network.length > 0 && (
+        <div className={styles.card}>
+          <div className={styles.cardTitleRow}>
+            <h2 className={styles.cardTitle}>Red de Duo</h2>
+            <span className={styles.edgeBadge}>Player ↔ PLAYED_WITH ↔ Player</span>
+          </div>
+          <p className={styles.cardSub}>Jugadores con quienes {player.summonerName} suele jugar — Dgraph</p>
+          <div className={styles.networkGrid}>
+            {network.map((p) => (
+              <div key={p.puuid} className={styles.networkCard}>
+                <div className={styles.networkHeader}>
+                  <div className={styles.networkAvatar}>{p.summonerName?.[0] || '?'}</div>
+                  <div>
+                    <div className={styles.networkName}>{p.summonerName}</div>
+                    <div className={styles.networkRegion}>{p.region?.toUpperCase()}</div>
+                  </div>
+                </div>
+                <div className={styles.networkStats}>
+                  <div><span className={styles.relLabel}>Partidas</span><span className={styles.relVal}>{p.gamesShared}</span></div>
+                  <div><span className={styles.relLabel}>Victorias</span><span className={styles.relVal} style={{ color: '#00d4a0' }}>{p.wins}</span></div>
+                  <div><span className={styles.relLabel}>Derrotas</span><span className={styles.relVal} style={{ color: '#e84057' }}>{p.losses}</span></div>
                 </div>
               </div>
             ))}

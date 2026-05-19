@@ -114,7 +114,52 @@
 .role_SUPPORT { background: rgba(244,114,182,0.15); color: #f472b6; border: 1px solid rgba(244,114,182,0.3); }
 
 .playerName { flex: 1; font-weight: 600; color: #cddaf0; font-size: 0.88rem; }
-.playerId { font-size: 0.72rem; color: #4a6a8a; font-family: monospace; }
+.playerRow { cursor: pointer; transition: background 0.15s; }
+.playerRow:hover { background: rgba(30,58,95,0.4); }
+.playerRowActive { background: rgba(167,139,250,0.08) !important; border-left: 2px solid #a78bfa; }
+.rivalHint { font-size: 0.7rem; color: #4a6a8a; margin-left: auto; }
+
+.rivalSection {
+  background: rgba(167,139,250,0.04);
+  border-left: 2px solid rgba(167,139,250,0.3);
+  margin: 0 0.75rem 0.4rem 2.5rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0 6px 6px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.rivalEdgeLabel {
+  font-size: 0.68rem;
+  font-family: monospace;
+  font-weight: 700;
+  color: #a78bfa;
+  background: rgba(167,139,250,0.08);
+  border: 1px solid rgba(167,139,250,0.2);
+  border-radius: 4px;
+  padding: 0.15rem 0.5rem;
+  display: inline-block;
+  margin-bottom: 0.25rem;
+}
+
+.rivalLoading { font-size: 0.8rem; color: #4a6a8a; }
+.rivalEmpty   { font-size: 0.8rem; color: #4a6a8a; }
+
+.rivalRow {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid rgba(167,139,250,0.1);
+  flex-wrap: wrap;
+}
+.rivalRow:last-child { border-bottom: none; }
+
+.rivalName { font-weight: 700; color: #cddaf0; font-size: 0.88rem; min-width: 90px; }
+.rivalStats { display: flex; gap: 1rem; flex-wrap: wrap; }
+.rivalStat  { font-size: 0.8rem; color: #cddaf0; display: flex; gap: 0.3rem; align-items: center; }
+.rivalTournaments { font-size: 0.7rem; color: #4a6a8a; font-family: monospace; margin-left: auto; }
 
 .infoCard {
   background: #111d2e;

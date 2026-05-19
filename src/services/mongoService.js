@@ -30,13 +30,11 @@ async function safeFetch(url, fallback) {
 }
 
 export function getAllChampions() {
-    return safeFetch(
-    `${BASE}/api/champion`, []);
-};
+    return safeFetch(`${BASE}/api/champion`, []);
+}
 
 export function getChampionById(championId) {
-    return safeFetch(
-        `${BASE}/api/champion/${championId}`, null);
+    return safeFetch(`${BASE}/api/champion/${championId}`, null);
 }
 
 export async function syncPlayerProfile(gameName, tagLine) {
